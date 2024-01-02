@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'CheckoutP'
-  s.version          = '0.1.2'
+  s.version          = '0.1.3'
   s.summary          = 'CheckoutP is a sample SDK which help in solving fee collection'
   s.swift_version    = '5.0'
 
@@ -17,7 +17,7 @@ Pod::Spec.new do |s|
   #   * Try to keep it short, snappy and to the point.
   #   * Write the description between the DESC delimiters below.
   #   * Finally, don't worry about the indent, CocoaPods strips it!
-  s.description      = 'This is the description for the CheckoutP Pod for testing.'
+  s.description      = 'This is the description for the CheckoutP is a sample SDK which help in solving fee collection'
 
   s.homepage         = 'https://github.com/1410avi/CheckoutP'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
