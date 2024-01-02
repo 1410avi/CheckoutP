@@ -1,8 +1,10 @@
 use_frameworks!
 
-platform :ios, '10.0'
+#platform :ios, '15.0'
 
 target 'CheckoutP_Example' do
+  pod 'CashfreePG', '~> 2.0.3'
+  pod 'razorpay-pod', '1.2.5'
   pod 'CheckoutP', :path => '../'
 
   target 'CheckoutP_Tests' do

@@ -46,7 +46,7 @@
 		78ABFB579AE8112F006F1610 /* Pods-CheckoutP_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CheckoutP_Tests.release.xcconfig"; path = "Target Support Files/Pods-CheckoutP_Tests/Pods-CheckoutP_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		AC19E3362F9E773231FDC0B8 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		B56D6F153D05EE99715B67C6 /* Pods-CheckoutP_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CheckoutP_Example.release.xcconfig"; path = "Target Support Files/Pods-CheckoutP_Example/Pods-CheckoutP_Example.release.xcconfig"; sourceTree = "<group>"; };
-		D608D5D23BED8E59F96F862F /* CheckoutP.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = CheckoutP.podspec; path = ../CheckoutP.podspec; sourceTree = "<group>"; };
+		D608D5D23BED8E59F96F862F /* CheckoutP.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = CheckoutP.podspec; path = ../CheckoutP.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -270,10 +270,22 @@
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-CheckoutP_Example/Pods-CheckoutP_Example-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/CheckoutP/CheckoutP.framework",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/CFNetworkSDK/CFNetworkSDK.framework/CFNetworkSDK",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/CashfreeAnalyticsSDK/CashfreeAnalyticsSDK.framework/CashfreeAnalyticsSDK",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/CashfreePG/CashfreePG.framework/CashfreePG",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/CashfreePGCoreSDK/CashfreePGCoreSDK.framework/CashfreePGCoreSDK",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/CashfreePGUISDK/CashfreePGUISDK.framework/CashfreePGUISDK",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/razorpay-pod/Razorpay.framework/Razorpay",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CheckoutP.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CFNetworkSDK.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CashfreeAnalyticsSDK.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CashfreePG.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CashfreePGCoreSDK.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CashfreePGUISDK.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Razorpay.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
