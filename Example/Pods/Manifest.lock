@@ -1,0 +1,16 @@
+PODS:
+  - CheckoutP (0.1.0)
+
+DEPENDENCIES:
+  - CheckoutP (from `../`)
+
+EXTERNAL SOURCES:
+  CheckoutP:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  CheckoutP: 862673a95317e76903ead47561dabb496d3f93b0
+
+PODFILE CHECKSUM: 58ce77b979ef1d6bf806cf5d783ddc2a6f346224
+
+COCOAPODS: 1.14.3
