@@ -90,6 +90,12 @@
 		D7FEDC4879C39EA2EE06A2F165A75491 /* CheckoutP-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = A9B9B1B62B582C61599DCDE1522276D5 /* CheckoutP-dummy.m */; };
 		E1627F792B44306100935D4E /* GQPaymentSDK.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1627F782B44306100935D4E /* GQPaymentSDK.swift */; };
 		E1627F7B2B44309700935D4E /* GQPaymentDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1627F7A2B44309700935D4E /* GQPaymentDelegate.swift */; };
+		E1627FA02B44405B00935D4E /* GQWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1627F9F2B44405B00935D4E /* GQWebView.swift */; };
+		E1627FA22B44407B00935D4E /* WebDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1627FA12B44407B00935D4E /* WebDelegate.swift */; };
+		E1627FA42B4457A900935D4E /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1627FA32B4457A900935D4E /* Environment.swift */; };
+		E1627FA62B4564B700935D4E /* Custom.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1627FA52B4564B700935D4E /* Custom.swift */; };
+		E1627FAC2B45F2A900935D4E /* APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1627FAB2B45F2A900935D4E /* APIService.swift */; };
+		E1627FAE2B4605F600935D4E /* Customer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1627FAD2B4605F600935D4E /* Customer.swift */; };
 		E79086489E506EDA4C767454AAC162CF /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73010CC983E3809BECEE5348DA1BB8C6 /* Foundation.framework */; };
 		EFCFE05FF3A31E454251AF6F82DBE721 /* Pods-CheckoutP_Tests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 9E65F642F35C8379EC6E42EFFA4B2A37 /* Pods-CheckoutP_Tests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
@@ -249,6 +255,12 @@
 		DD2525A5848BFDCA63B5F89916C41F82 /* Pods-CheckoutP_Tests */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "Pods-CheckoutP_Tests"; path = Pods_CheckoutP_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1627F782B44306100935D4E /* GQPaymentSDK.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GQPaymentSDK.swift; path = CheckoutP/Classes/GQPaymentSDK.swift; sourceTree = "<group>"; };
 		E1627F7A2B44309700935D4E /* GQPaymentDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GQPaymentDelegate.swift; path = CheckoutP/Classes/GQPaymentDelegate.swift; sourceTree = "<group>"; };
+		E1627F9F2B44405B00935D4E /* GQWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GQWebView.swift; sourceTree = "<group>"; };
+		E1627FA12B44407B00935D4E /* WebDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebDelegate.swift; sourceTree = "<group>"; };
+		E1627FA32B4457A900935D4E /* Environment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
+		E1627FA52B4564B700935D4E /* Custom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Custom.swift; sourceTree = "<group>"; };
+		E1627FAB2B45F2A900935D4E /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
+		E1627FAD2B4605F600935D4E /* Customer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Customer.swift; sourceTree = "<group>"; };
 		E70342707FFE1ECD70ADD8FC76A2E17D /* CheckoutP-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "CheckoutP-umbrella.h"; sourceTree = "<group>"; };
 		EC54BCB3F122650904D678B66BF563D8 /* CashfreePGCoreSDK.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = CashfreePGCoreSDK.debug.xcconfig; sourceTree = "<group>"; };
 		EFB7FD71392F1D4CDFB8BBB01B9C35EA /* CashfreePG.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = CashfreePG.release.xcconfig; sourceTree = "<group>"; };
@@ -340,6 +352,12 @@
 				7F8D7C822898BBBA34412A1453D0D267 /* Support Files */,
 				E1627F782B44306100935D4E /* GQPaymentSDK.swift */,
 				E1627F7A2B44309700935D4E /* GQPaymentDelegate.swift */,
+				E1627F9F2B44405B00935D4E /* GQWebView.swift */,
+				E1627FA12B44407B00935D4E /* WebDelegate.swift */,
+				E1627FA32B4457A900935D4E /* Environment.swift */,
+				E1627FA52B4564B700935D4E /* Custom.swift */,
+				E1627FAB2B45F2A900935D4E /* APIService.swift */,
+				E1627FAD2B4605F600935D4E /* Customer.swift */,
 			);
 			name = CheckoutP;
 			path = ../..;
@@ -870,8 +888,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				E1627F792B44306100935D4E /* GQPaymentSDK.swift in Sources */,
+				E1627FAE2B4605F600935D4E /* Customer.swift in Sources */,
+				E1627FA22B44407B00935D4E /* WebDelegate.swift in Sources */,
+				E1627FA62B4564B700935D4E /* Custom.swift in Sources */,
 				608060805D8A8125085CF62EE3212735 /* CheckoutP.swift in Sources */,
+				E1627FA42B4457A900935D4E /* Environment.swift in Sources */,
 				D7FEDC4879C39EA2EE06A2F165A75491 /* CheckoutP-dummy.m in Sources */,
+				E1627FA02B44405B00935D4E /* GQWebView.swift in Sources */,
+				E1627FAC2B45F2A900935D4E /* APIService.swift in Sources */,
 				E1627F7B2B44309700935D4E /* GQPaymentDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
