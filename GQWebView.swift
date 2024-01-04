@@ -21,8 +21,9 @@ class GQWebView: UIViewController, CFResponseDelegate, RazorpayPaymentCompletion
     var recurring: Bool?
     var notes: [String:Any]?
     var customer_id: String?
+    var callBackUrl: String?
     let customInstance = Custom()
-    
+    var vName: String?
     var loadURL: String?
     
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
@@ -32,10 +33,10 @@ class GQWebView: UIViewController, CFResponseDelegate, RazorpayPaymentCompletion
                 let con = try JSONSerialization.jsonObject(with: data.data(using: .utf8)!, options: []) as! [String: Any]
                 print("sdkSuccess: \(con)")
                 print("sdkSuccessdata: \(data)")
-//                delegate?.gqSuccessResponse(data: con)
+                //                delegate?.gqSuccessResponse(data: con)
             } catch {
                 print(error)
-//                delegate?.gqErrorResponse(error: true, message: error.localizedDescription)
+                //                delegate?.gqErrorResponse(error: true, message: error.localizedDescription)
                 self.dismiss(animated: true, completion: nil)
             }
         }else if (message.name == "sdkCancel") {
@@ -47,33 +48,69 @@ class GQWebView: UIViewController, CFResponseDelegate, RazorpayPaymentCompletion
                 self.dismiss(animated: true, completion: nil)
             } catch {
                 print(error)
-//                delegate?.gqErrorResponse(error: true, message: error.localizedDescription)
+                //                delegate?.gqErrorResponse(error: true, message: error.localizedDescription)
                 self.dismiss(animated: true, completion: nil)
             }
-//            self.dismiss(animated: true, completion: nil)
+            //            self.dismiss(animated: true, completion: nil)
         }else if (message.name == "sendPGOptions") {
             let data = message.body as! String
             
             if let jsonData = data.data(using: .utf8) {
                 do {
                     if let json = try JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: Any],
-                       let name = json["name"] as? String,
-                       let pgOptions = json["pgOptions"] as? [String: Any],
-                       let orderCode1 = pgOptions["order_code"] as? String,
-                       let mdMappingCode = pgOptions["md_mapping_code"] as? String,
-                       let paymentSessionId1 = pgOptions["payment_session_id"] as? String {
+                       let name = json["name"] as? String{
+                    
+                        vName = name
+                        print("Name: \(vName)")
                         
-                        paymentSessionId = paymentSessionId1
-                        orderId = orderCode1
-
-                        // Use the extracted values
-                        print("Name: \(name)")
-                        print("Order Code: \(orderCode1)")
-                        print("MD Mapping Code: \(mdMappingCode)")
-                        print("Payment Session ID: \(paymentSessionId1)")
-                        
-                        DispatchQueue.main.async {
-                            self.openPG(paymentSessionId: paymentSessionId1, orderId: orderCode1)
+                        if name == "CASHFREE"{
+                            if let pgOptions = json["pgOptions"] as? [String: Any],
+                               let orderCode1 = pgOptions["order_code"] as? String,
+                               let mdMappingCode = pgOptions["md_mapping_code"] as? String,
+                               let paymentSessionId1 = pgOptions["payment_session_id"] as? String {
+                                
+                                paymentSessionId = paymentSessionId1
+                                orderId = orderCode1
+                                
+                                // Use the extracted values
+                                print("Name: \(name)")
+                                print("Order Code: \(orderCode1)")
+                                print("MD Mapping Code: \(mdMappingCode)")
+                                print("Payment Session ID: \(paymentSessionId1)")
+                                
+                                DispatchQueue.main.async {
+                                    self.openPG(paymentSessionId: paymentSessionId1, orderId: orderCode1)
+                                }
+                            }
+                            
+                        } else if let pgOptions = json["pgOptions"] as? [String: Any],
+                                  let key = pgOptions["key"] as? String,
+                                  let order_id = pgOptions["order_id"] as? String,
+                                  var redirect = pgOptions["redirect"] as? Bool,
+                                  let prefillObj = pgOptions["prefill"] as? [String: Any],
+                                  let notes = pgOptions["notes"] as? [String: Any]
+                        {
+                            let name = prefillObj["name"] as? String
+                            let email = prefillObj["email"] as? String
+                            let contact = prefillObj["contact"] as? String
+                            
+                            print("key: \(key)")
+                            
+                            razorpay = RazorpayCheckout.initWithKey(key, andDelegateWithData: self)
+                            
+                            let options: [String:Any] = [
+                                "order_id": order_id,
+                                "recurring": 0,
+                                "redirect": redirect,
+                                "notes": notes,
+                                "prefill": [
+                                    "contact": contact,
+                                    "email": email
+                                ]
+                            ]
+                            DispatchQueue.main.async {
+                                self.razorpay!.open(options, displayController: self)
+                            }
                         }
                     }
                 } catch {
@@ -81,6 +118,45 @@ class GQWebView: UIViewController, CFResponseDelegate, RazorpayPaymentCompletion
                 }
             }
         }else if (message.name == "sendADOptions") {
+            
+            let data = message.body as! String
+            
+            if let jsonData = data.data(using: .utf8) {
+                do {
+                    if let json = try JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: Any],
+                       let key = json["key"] as? String,
+                       let customer_id = json["customer_id"] as? String,
+                       let order_id = json["order_id"] as? String,
+                       let recurring = json["recurring"] as? String,
+                       let redirect = json["redirect"] as? Bool,
+                       let callback_url = json["callback_url"] as? String,
+                       let notes = json["notes"] as? [String: Any]{
+                        print("AdKey: \(key)")
+                        callBackUrl = callback_url
+                        
+                        razorpay = RazorpayCheckout.initWithKey(key, andDelegateWithData: self)
+                        
+                        var recuring_flag: Bool = false
+                        
+                        if recurring == "1"{
+                            recuring_flag = true
+                        }
+                        let options: [String:Any] = [
+                            "customer_id": customer_id,
+                            "order_id": order_id,
+                            "recurring": recuring_flag,
+                            "redirect": redirect,
+                            "notes": notes,
+                        ]
+                        DispatchQueue.main.async {
+                            self.razorpay!.open(options, displayController: self)
+                        }
+                    }
+                } catch {
+                    print("Error parsing JSON: \(error)")
+                }
+            }
+            
             let ad_data = convertStringToDictionary(text: message.body as! String)
             let razorpay_key = ad_data!["key"] as! String
             rOrderId = ad_data!["order_id"] as? String
@@ -90,64 +166,64 @@ class GQWebView: UIViewController, CFResponseDelegate, RazorpayPaymentCompletion
             customer_id = ad_data!["customer_id"] as? String
             let recurring_flag: Bool?
             
-            if (recurring as! String == "1") { recurring_flag = true }
-            else { recurring_flag = false }
+            //            if (recurring as! String == "1") { recurring_flag = true }
+            //            else { recurring_flag = false }
             
             razorpay = RazorpayCheckout.initWithKey(razorpay_key, andDelegate: self)
             
             
-//            checkout_details = CheckoutDetails(order_id: order_id as? String ?? "", razorpay_key: (razorpay_key as! String), recurring: recurring_flag ?? true, notes: (notes as? [String : Any] ?? ["nil": "nil"]), customer_id: (customer_id as! String), callback_url: (callback_url as! String))
-//
-//            let newViewController = CheckoutViewController()
-//            newViewController.checkout_details = checkout_details
-//            newViewController.delegate = self
-//            self.present(newViewController, animated: true, completion: nil)
+            //            checkout_details = CheckoutDetails(order_id: order_id as? String ?? "", razorpay_key: (razorpay_key as! String), recurring: recurring_flag ?? true, notes: (notes as? [String : Any] ?? ["nil": "nil"]), customer_id: (customer_id as! String), callback_url: (callback_url as! String))
+            //
+            //            let newViewController = CheckoutViewController()
+            //            newViewController.checkout_details = checkout_details
+            //            newViewController.delegate = self
+            //            self.present(newViewController, animated: true, completion: nil)
         }
         print("Received message from web -> \(message.body)")
     }
     
     func convertStringToDictionary(text: String) -> [String:AnyObject]? {
-       if let data = text.data(using: .utf8) {
-           do {
-               let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [String:AnyObject]
-               return json
-           } catch {
-               print("Something went wrong")
-//               delegate?.gqErrorResponse(error: true, message: error.localizedDescription)
-               self.dismiss(animated: true, completion: nil)
-           }
-       }
-       return nil
-   }
+        if let data = text.data(using: .utf8) {
+            do {
+                let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [String:AnyObject]
+                return json
+            } catch {
+                print("Something went wrong")
+                //               delegate?.gqErrorResponse(error: true, message: error.localizedDescription)
+                self.dismiss(animated: true, completion: nil)
+            }
+        }
+        return nil
+    }
     
     public override func viewDidAppear(_ animated: Bool) {
-    super.viewWillAppear(animated)
-        self.showPaymentForm()
+        super.viewWillAppear(animated)
+        //        self.showPaymentForm()
     }
     
-    internal func showPaymentForm(){
-        let options: [String:Any] = [
-//            "amount": "100", //This is in currency subunits. 100 = 100 paise= INR 1.
-//            "currency": "INR",//We support more that 92 international currencies.
-//            "description": "purchase description",
-            "order_id": rOrderId,
-            "recurring": recurring,
-//            "image": "https://url-to-image.jpg",
-//            "name": "business or product name",
-            "notes": notes,
-            "customer_id": customer_id
-//            "prefill": [
-//                "contact": "9797979797",
-//                "email": "foo@bar.com"
-//            ],
-//            "theme": [
-//                "color": "#F37254"
-//            ]
-        ]
-        DispatchQueue.main.async {
-//            self.razorpay!.open(options, displayController: self)
-        }
-    }
+    //    internal func showPaymentForm(){
+    //        let options: [String:Any] = [
+    //            //            "amount": "100", //This is in currency subunits. 100 = 100 paise= INR 1.
+    //            //            "currency": "INR",//We support more that 92 international currencies.
+    //            //            "description": "purchase description",
+    //            "order_id": rOrderId,
+    //            "recurring": recurring,
+    //            //            "image": "https://url-to-image.jpg",
+    //            //            "name": "business or product name",
+    //            "notes": notes,
+    //            "customer_id": customer_id
+    //            //            "prefill": [
+    //            //                "contact": "9797979797",
+    //            //                "email": "foo@bar.com"
+    //            //            ],
+    //            //            "theme": [
+    //            //                "color": "#F37254"
+    //            //            ]
+    //        ]
+    //        DispatchQueue.main.async {
+    //            //            self.razorpay!.open(options, displayController: self)
+    //        }
+    //    }
     
     public var delegate: GQPaymentDelegate?
     var webDelegate: WebDelegate?
@@ -168,9 +244,9 @@ class GQWebView: UIViewController, CFResponseDelegate, RazorpayPaymentCompletion
         webView.uiDelegate = self
         webView.navigationDelegate = self
         
-           webView.uiDelegate = self
-           view = webView
-       }
+        webView.uiDelegate = self
+        view = webView
+    }
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -179,33 +255,33 @@ class GQWebView: UIViewController, CFResponseDelegate, RazorpayPaymentCompletion
         
         let environment = Environment.shared
         print("Global Env: \(environment.env)")
-//        
-//        let myURL = URL(string:"https://erp-sdk.graydev.tech/instant-eligibility?gapik=b59bf799-2a82-4298-b901-09c512ea4aaa&abase=R1EtMGQyZWQyNGUtY2MxZi00MDBiLWE0ZTMtNzIwOGM4OGI5OWI1OmE5NmRkN2VhLTdkNGEtNDc3Mi05MmMzLWFjNDgxNzEzYmU0YQ==&sid=demo_12345&m=8625960119&env=test&cid=34863&ccode=0a6c1b84-0cd7-4844-8f77-cd1807520273&pc=&s=asdk&user=existing&_v=\"1.1\"")
+        //
+        //        let myURL = URL(string:"https://erp-sdk.graydev.tech/instant-eligibility?gapik=b59bf799-2a82-4298-b901-09c512ea4aaa&abase=R1EtMGQyZWQyNGUtY2MxZi00MDBiLWE0ZTMtNzIwOGM4OGI5OWI1OmE5NmRkN2VhLTdkNGEtNDc3Mi05MmMzLWFjNDgxNzEzYmU0YQ==&sid=demo_12345&m=8625960119&env=test&cid=34863&ccode=0a6c1b84-0cd7-4844-8f77-cd1807520273&pc=&s=asdk&user=existing&_v=\"1.1\"")
         let myURL = URL(string:loadURL ?? "https://grayquest.com")
         let myRequest = URLRequest(url: myURL!)
         webView.load(myRequest)
     }
     
-//    private func getSession() -> CFSession? {
-//            do {
-//                let session = try CFSession.CFSessionBuilder()
-//                    .setEnvironment(.SANDBOX)
-//                    .setPaymentSessionId(paymentSessionId)
-//                    .setOrderID(orderId)
-//                    .build()
-//                return session
-//            } catch let e {
-//                let error = e as! CashfreeError
-//                print(error.localizedDescription)
-//                // Handle errors here
-//            }
-//            return nil
-//        }
+    //    private func getSession() -> CFSession? {
+    //            do {
+    //                let session = try CFSession.CFSessionBuilder()
+    //                    .setEnvironment(.SANDBOX)
+    //                    .setPaymentSessionId(paymentSessionId)
+    //                    .setOrderID(orderId)
+    //                    .build()
+    //                return session
+    //            } catch let e {
+    //                let error = e as! CashfreeError
+    //                print(error.localizedDescription)
+    //                // Handle errors here
+    //            }
+    //            return nil
+    //        }
     
     func openPG(paymentSessionId: String, orderId: String) {
         
         do {
-              let session = try CFSession.CFSessionBuilder()
+            let session = try CFSession.CFSessionBuilder()
                 .setPaymentSessionId(paymentSessionId)
                 .setOrderID(orderId)
                 .setEnvironment(.SANDBOX)
@@ -233,88 +309,88 @@ class GQWebView: UIViewController, CFResponseDelegate, RazorpayPaymentCompletion
                 .setButtonTextColor("#FFFFFF")
                 .setPrimaryTextColor("#000000")
                 .setSecondaryTextColor("#000000")
-//                .setPrimaryFont("Source Sans Pro")
-//                .setSecondaryFont("Gill Sans")
-//                .setButtonTextColor("#FFFFFF")
-//                .setButtonBackgroundColor("#FF0000")
-//                .setNavigationBarTextColor("#FFFFFF")
-//                .setNavigationBarBackgroundColor("#FF0000")
-//                .setPrimaryTextColor("#FF0000")
-//                .setSecondaryTextColor("#FF0000")
+            //                .setPrimaryFont("Source Sans Pro")
+            //                .setSecondaryFont("Gill Sans")
+            //                .setButtonTextColor("#FFFFFF")
+            //                .setButtonBackgroundColor("#FF0000")
+            //                .setNavigationBarTextColor("#FFFFFF")
+            //                .setNavigationBarBackgroundColor("#FF0000")
+            //                .setPrimaryTextColor("#FF0000")
+            //                .setSecondaryTextColor("#FF0000")
                 .build()
             
-              let webCheckoutPayment = try CFDropCheckoutPayment.CFDropCheckoutPaymentBuilder()
+            let webCheckoutPayment = try CFDropCheckoutPayment.CFDropCheckoutPaymentBuilder()
                 .setSession(session).setComponent(paymentComponents).setTheme(theme)
                 .build()
-              try pgService.doPayment(webCheckoutPayment, viewController: self)
-            } catch let e {
-              let err = e as! CashfreeError
-              print(err.description)
-            }
+            try pgService.doPayment(webCheckoutPayment, viewController: self)
+        } catch let e {
+            let err = e as! CashfreeError
+            print(err.description)
+        }
         
         
-//        do {
-//            let session = try CFSession.CFSessionBuilder()
-//                .setEnvironment(.SANDBOX)
-//                .setPaymentSessionId(paymentSessionId)
-//                .setOrderID(orderId)
-//                .build()
-//
-//            let webCheckoutPayment = try CFWebCheckoutPayment.CFWebCheckoutPaymentBuilder()
-//                .setSession(session)
-//                .build()
-//
-//            try self.cfPaymentGatewayService.doPayment(webCheckoutPayment, viewController: self)
-//
-//        } catch let e {
-//            let error = e as! CashfreeError
-//            print(error.localizedDescription)
-//            // Handle errors here
-//        }
+        //        do {
+        //            let session = try CFSession.CFSessionBuilder()
+        //                .setEnvironment(.SANDBOX)
+        //                .setPaymentSessionId(paymentSessionId)
+        //                .setOrderID(orderId)
+        //                .build()
+        //
+        //            let webCheckoutPayment = try CFWebCheckoutPayment.CFWebCheckoutPaymentBuilder()
+        //                .setSession(session)
+        //                .build()
+        //
+        //            try self.cfPaymentGatewayService.doPayment(webCheckoutPayment, viewController: self)
+        //
+        //        } catch let e {
+        //            let error = e as! CashfreeError
+        //            print(error.localizedDescription)
+        //            // Handle errors here
+        //        }
         
-//        if let session = self.getSession() {
-//            do {
-//
-//                // Set Components
-//                let paymentComponents = try CFPaymentComponent.CFPaymentComponentBuilder()
-//                    .enableComponents([
-//                        "order-details",
-//                        "card",
-//                        "paylater",
-//                        "wallet",
-//                        "emi",
-//                        "netbanking",
-//                        "upi"
-//                    ])
-//                    .build()
-//
-////                // Set Theme
-//                let theme = try CFTheme.CFThemeBuilder()
-//                    .setPrimaryFont("Source Sans Pro")
-//                    .setSecondaryFont("Gill Sans")
-//                    .setButtonTextColor("#FFFFFF")
-//                    .setButtonBackgroundColor("#FF0000")
-//                    .setNavigationBarTextColor("#FFFFFF")
-//                    .setNavigationBarBackgroundColor("#FF0000")
-//                    .setPrimaryTextColor("#FF0000")
-//                    .setSecondaryTextColor("#FF0000")
-//                    .build()
-//
-//                // Native payment
-//                let webCheckoutPayment = try CFWebCheckoutPayment.CFWebCheckoutPaymentBuilder()
-//                    .setSession(session)
-//                    .build()
-//
-//                // Invoke SDK
-//                try self.cfPaymentGatewayService.doPayment(webCheckoutPayment, viewController: self)
-//
-//
-//            } catch let e {
-//                let error = e as! CashfreeError
-//                print(error.localizedDescription)
-//                // Handle errors here
-//            }
-//        }
+        //        if let session = self.getSession() {
+        //            do {
+        //
+        //                // Set Components
+        //                let paymentComponents = try CFPaymentComponent.CFPaymentComponentBuilder()
+        //                    .enableComponents([
+        //                        "order-details",
+        //                        "card",
+        //                        "paylater",
+        //                        "wallet",
+        //                        "emi",
+        //                        "netbanking",
+        //                        "upi"
+        //                    ])
+        //                    .build()
+        //
+        ////                // Set Theme
+        //                let theme = try CFTheme.CFThemeBuilder()
+        //                    .setPrimaryFont("Source Sans Pro")
+        //                    .setSecondaryFont("Gill Sans")
+        //                    .setButtonTextColor("#FFFFFF")
+        //                    .setButtonBackgroundColor("#FF0000")
+        //                    .setNavigationBarTextColor("#FFFFFF")
+        //                    .setNavigationBarBackgroundColor("#FF0000")
+        //                    .setPrimaryTextColor("#FF0000")
+        //                    .setSecondaryTextColor("#FF0000")
+        //                    .build()
+        //
+        //                // Native payment
+        //                let webCheckoutPayment = try CFWebCheckoutPayment.CFWebCheckoutPaymentBuilder()
+        //                    .setSession(session)
+        //                    .build()
+        //
+        //                // Invoke SDK
+        //                try self.cfPaymentGatewayService.doPayment(webCheckoutPayment, viewController: self)
+        //
+        //
+        //            } catch let e {
+        //                let error = e as! CashfreeError
+        //                print(error.localizedDescription)
+        //                // Handle errors here
+        //            }
+        //        }
     }
     
     public func onPaymentError(_ code: Int32, description str: String, andData response: [AnyHashable : Any]?) {
@@ -326,8 +402,16 @@ class GQWebView: UIViewController, CFResponseDelegate, RazorpayPaymentCompletion
     
     public func onPaymentSuccess(_ payment_id: String, andData response: [AnyHashable : Any]?) {
         var userInfo = response as NSDictionary? as? [String: String]
+        print("success: ", response)
+        let paymentId = response?["razorpay_payment_id"] as! String
+        let rezorSignature = response?["razorpay_signature"] as! String
         print("SuccessPaymentID: \(payment_id)")
         print("SuccessResponse: \(userInfo)")
+        if !vName!.isEmpty, vName == "UNIPG"{
+            print("VName: \(String(describing: vName))")
+        }else {
+            print("VNameCash; \(String(describing: vName))")
+        }
     }
     
     public func onError(_ error: CashfreePGCoreSDK.CFErrorResponse, order_id: String) {

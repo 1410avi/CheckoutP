@@ -47,33 +47,27 @@ public class GQPaymentSDK: UIViewController, WebDelegate {
                             print("Client ID: \(clientId)")
                             print("Client Secret: \(clientSecret)")
                             print("API Key: \(apiKey)")
-                            DispatchQueue.main.async {
-                                self.environment.updateClientId(clientID: clientId)
-                                self.environment.updateClientSecret(clientSecret: clientSecret)
-                                self.environment.updateApiKey(apiKey: apiKey)
-                                var abase = self.customInstance.encodeStringToBase64(self.environment.clientID+":"+self.environment.clientSecret)
-                                
-                                self.environment.updateAbase(abase: abase!)
-                            }
+                            environment.updateClientId(clientID: clientId)
+                            environment.updateClientSecret(clientSecret: clientSecret)
+                            environment.updateApiKey(apiKey: apiKey)
+                            var abase = customInstance.encodeStringToBase64(environment.clientID+":"+environment.clientSecret)
+                            
+                            environment.updateAbase(abase: abase!)
                         } else {
                             print("No Auth Object available")
                         }
                         
                         if let studentID = json["student_id"] as? String {
                             print("Student ID: \(studentID)")
-                            DispatchQueue.main.async {
-                                self.environment.updateStudentID(stdId: studentID)
-                            }
+                            environment.updateStudentID(stdId: studentID)
                         }
                         
                         if let env = json["env"] as? String {
-                            DispatchQueue.main.async {
-                                if self.containsAnyValidEnvironment(env){
-                                    self.environment.update(environment: env)
-                                    print("Environment: \(env)")
-                                }else{
-                                    print("Invalid Environment: \(env)")
-                                }
+                            if containsAnyValidEnvironment(env){
+                                environment.update(environment: env)
+                                print("Environment: \(env)")
+                            }else{
+                                print("Invalid Environment: \(env)")
                             }
                         }else{
                             print("Environment Not Available ")
@@ -82,29 +76,26 @@ public class GQPaymentSDK: UIViewController, WebDelegate {
                         if let customization = json["customization"] as? [String: Any],
                            let theme_color = customization["theme_color"] as? String {
                             print("themeColor: \(theme_color)")
-                            DispatchQueue.main.async {
-                                self.environment.updateTheme(theme: theme_color)
-                                if let customizationData = try? JSONSerialization.data(withJSONObject: customization as Any, options: .prettyPrinted),
-                                   let customizationString = String(data: customizationData, encoding: .utf8) {
-                                    self.environment.updateCustomization(customization: customizationString)
-                                    print("customizationString: \(customizationString)")
-                                } else {
-                                    print("Error converting customization to JSON string.")
-                                }
+                            environment.updateTheme(theme: theme_color)
+                            print("customization: \(json["customization"] as? [String: Any])")
+                            if let customizationData = try? JSONSerialization.data(withJSONObject: customization as Any, options: .prettyPrinted),
+                               let customizationString = String(data: customizationData, encoding: .utf8) {
+                                environment.updateCustomization(customization: customizationString)
+                                print("customizationString: \(customizationString)")
+                            } else {
+                                print("Error converting customization to JSON string.")
                             }
                         }
                         
                         if var ppConfig = json["pp_config"] as? [String: Any]{
                             if let slug = ppConfig["slug"] as? String, !slug.isEmpty {
                                 print("slug: \(slug)")
-                                DispatchQueue.main.async {
-                                    if let ppConfigData = try? JSONSerialization.data(withJSONObject: ppConfig as Any, options: .prettyPrinted),
-                                       let ppConfigString = String(data: ppConfigData, encoding: .utf8) {
-                                        print("ppConfigString: \(ppConfigString)")
-                                        self.environment.updatePpConfig(ppConfig: ppConfigString)
-                                    } else {
-                                        print("Invalid ppConfig JSON")
-                                    }
+                                if let ppConfigData = try? JSONSerialization.data(withJSONObject: ppConfig as Any, options: .prettyPrinted),
+                                   let ppConfigString = String(data: ppConfigData, encoding: .utf8) {
+                                    print("ppConfigString: \(ppConfigString)")
+                                    environment.updatePpConfig(ppConfig: ppConfigString)
+                                } else {
+                                    print("Invalid ppConfig JSON")
                                 }
                             } else {
                                 print("Slug Not available")
@@ -114,32 +105,28 @@ public class GQPaymentSDK: UIViewController, WebDelegate {
                         }
                         
                         if var feeHeaders = json["fee_headers"] as? [String: Any]{
-                            DispatchQueue.main.async {
-                                if let feeHeadersData = try? JSONSerialization.data(withJSONObject: feeHeaders as Any, options: .prettyPrinted),
-                                   let feeHeadersString = String(data: feeHeadersData, encoding: .utf8) {
-                                    print("feeHeadersString: \(feeHeadersString)")
-                                    self.environment.updateFeeHeaders(feeHeader: feeHeadersString)
-                                } else {
-                                    print("Invalid Fee Headers JSON")
-                                }
+                            if let feeHeadersData = try? JSONSerialization.data(withJSONObject: feeHeaders as Any, options: .prettyPrinted),
+                               let feeHeadersString = String(data: feeHeadersData, encoding: .utf8) {
+                                print("feeHeadersString: \(feeHeadersString)")
+                                environment.updateFeeHeaders(feeHeader: feeHeadersString)
+                            } else {
+                                print("Invalid Fee Headers JSON")
                             }
                         } else {
                             print("Fee Headers Not avaibale")
                         }
                         
-                        if let customerNumber = json["customer_number"] as? String, customerNumber.isEmpty {
-                            DispatchQueue.main.async {
-                                if self.validate(value: customerNumber){
-                                    print("Customer Number: \(customerNumber)")
-                                    self.environment.updateCustomerNumber(customerNumber: customerNumber)
-                                    self.mobileNumber = customerNumber
-                                    
-                                    DispatchQueue.main.async {
-                                        self.customer()
-                                    }
-                                }else{
-                                    print("Invalid Customer Number: \(customerNumber)")
+                        if let customerNumber = json["customer_number"] as? String {
+                            if validate(value: customerNumber){
+                                print("Customer Number: \(customerNumber)")
+                                environment.updateCustomerNumber(customerNumber: customerNumber)
+                                mobileNumber = customerNumber
+                                
+                                DispatchQueue.main.async {
+                                    self.customer()
                                 }
+                            }else{
+                                print("Invalid Customer Number: \(customerNumber)")
                             }
                         }else{
                             environment.updateCustomerType(custType: "new")
@@ -225,7 +212,7 @@ public class GQPaymentSDK: UIViewController, WebDelegate {
         
         var webloadUrl: String = ""
         
-        let baseURL = environment.webLoadURL()
+        let baseURL = self.environment.webLoadURL()
         
         webloadUrl = baseURL
         

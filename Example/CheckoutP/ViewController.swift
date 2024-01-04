@@ -31,15 +31,21 @@ class ViewController: UIViewController, GQPaymentDelegate {
     }
     @IBAction func openSDK(_ sender: Any) {
         
+//        let auth: [String: Any] = [
+//            "client_id": "GQ-0d2ed24e-cc1f-400b-a4e3-7208c88b99b5",
+//            "client_secret": "a96dd7ea-7d4a-4772-92c3-ac481713be4a",
+//            "gq_api_key": "b59bf799-2a82-4298-b901-09c512ea4aaa"
+//        ]
+        
         let auth: [String: Any] = [
-            "client_id": "GQ-0d2ed24e-cc1f-400b-a4e3-7208c88b99b5",
-            "client_secret": "a96dd7ea-7d4a-4772-92c3-ac481713be4a",
-            "gq_api_key": "b59bf799-2a82-4298-b901-09c512ea4aaa"
+            "client_id": "GQ-e2daf990-c020-4162-9a2f-da9ec6423be5",
+            "client_secret": "51028d07-97aa-4498-8379-5c2e8e4d3716",
+            "gq_api_key": "08051930-3621-42ff-858b-cb86383df2d5"
         ]
         
         let ppConfig: [String: Any] = [
-            "slug": "masira-darvesh-gile",
-            "card_code": "card_code"
+            "slug": "masira-darvesh-ayc-two"
+//            "card_code": "card_code"
         ]
         
         let feeHeaders: [String: Any] = [
@@ -59,8 +65,8 @@ class ViewController: UIViewController, GQPaymentDelegate {
             "student_id": "demo_1022",
             "env": "test",
             "customer_number": "8425900022",
-            "pp_config": ppConfig,
-            "fee_headers": feeHeaders,
+//            "pp_config": ppConfig,
+//            "fee_headers": feeHeaders,
             "customization": customization
         ]
         
