@@ -255,12 +255,12 @@
 		DD2525A5848BFDCA63B5F89916C41F82 /* Pods-CheckoutP_Tests */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "Pods-CheckoutP_Tests"; path = Pods_CheckoutP_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1627F782B44306100935D4E /* GQPaymentSDK.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GQPaymentSDK.swift; path = CheckoutP/Classes/GQPaymentSDK.swift; sourceTree = "<group>"; };
 		E1627F7A2B44309700935D4E /* GQPaymentDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GQPaymentDelegate.swift; path = CheckoutP/Classes/GQPaymentDelegate.swift; sourceTree = "<group>"; };
-		E1627F9F2B44405B00935D4E /* GQWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GQWebView.swift; sourceTree = "<group>"; };
-		E1627FA12B44407B00935D4E /* WebDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebDelegate.swift; sourceTree = "<group>"; };
-		E1627FA32B4457A900935D4E /* Environment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
-		E1627FA52B4564B700935D4E /* Custom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Custom.swift; sourceTree = "<group>"; };
-		E1627FAB2B45F2A900935D4E /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
-		E1627FAD2B4605F600935D4E /* Customer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Customer.swift; sourceTree = "<group>"; };
+		E1627F9F2B44405B00935D4E /* GQWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GQWebView.swift; path = CheckoutP/Classes/GQWebView.swift; sourceTree = "<group>"; };
+		E1627FA12B44407B00935D4E /* WebDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WebDelegate.swift; path = CheckoutP/Classes/WebDelegate.swift; sourceTree = "<group>"; };
+		E1627FA32B4457A900935D4E /* Environment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Environment.swift; path = CheckoutP/Classes/Environment.swift; sourceTree = "<group>"; };
+		E1627FA52B4564B700935D4E /* Custom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Custom.swift; path = CheckoutP/Classes/Custom.swift; sourceTree = "<group>"; };
+		E1627FAB2B45F2A900935D4E /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = APIService.swift; path = CheckoutP/Classes/APIService.swift; sourceTree = "<group>"; };
+		E1627FAD2B4605F600935D4E /* Customer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Customer.swift; path = CheckoutP/Classes/Customer.swift; sourceTree = "<group>"; };
 		E70342707FFE1ECD70ADD8FC76A2E17D /* CheckoutP-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "CheckoutP-umbrella.h"; sourceTree = "<group>"; };
 		EC54BCB3F122650904D678B66BF563D8 /* CashfreePGCoreSDK.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = CashfreePGCoreSDK.debug.xcconfig; sourceTree = "<group>"; };
 		EFB7FD71392F1D4CDFB8BBB01B9C35EA /* CashfreePG.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = CashfreePG.release.xcconfig; sourceTree = "<group>"; };
@@ -347,12 +347,12 @@
 		53A2177152867A369F59A2AB46571C67 /* CheckoutP */ = {
 			isa = PBXGroup;
 			children = (
+				E1627F9F2B44405B00935D4E /* GQWebView.swift */,
 				A0DB4BC0BA362ABA06136E5FDCE1AC9B /* CheckoutP.swift */,
 				5C86EC878C0F23E1704C3C2A23E3D65F /* Pod */,
 				7F8D7C822898BBBA34412A1453D0D267 /* Support Files */,
 				E1627F782B44306100935D4E /* GQPaymentSDK.swift */,
 				E1627F7A2B44309700935D4E /* GQPaymentDelegate.swift */,
-				E1627F9F2B44405B00935D4E /* GQWebView.swift */,
 				E1627FA12B44407B00935D4E /* WebDelegate.swift */,
 				E1627FA32B4457A900935D4E /* Environment.swift */,
 				E1627FA52B4564B700935D4E /* Custom.swift */,
