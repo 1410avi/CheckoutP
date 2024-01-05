@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'CheckoutP'
-  s.version          = '0.1.4'
+  s.version          = '0.1.5'
   s.summary          = 'CheckoutP is a sample SDK which help in solving fee collection'
   s.swift_version    = '5.0'
 

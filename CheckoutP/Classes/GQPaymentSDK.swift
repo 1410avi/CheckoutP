@@ -31,7 +31,7 @@ public class GQPaymentSDK: UIViewController, WebDelegate {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        
+        print("0.1.5")
         if let jsonString = customInstance.convertDictionaryToJson(dictionary: clientJSONObject ?? ["errpr":"Invalid JSON Object"]) {
             print("JSON String: \(jsonString)")
             if let jsonData = jsonString.data(using: .utf8) {
