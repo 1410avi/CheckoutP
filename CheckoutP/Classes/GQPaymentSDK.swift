@@ -17,7 +17,19 @@ public class GQPaymentSDK: UIViewController, WebDelegate {
     func sdCancel(data: [String : Any]?) {
         print("sdCancel web callback received with data: \(String(describing: data))")
         delegate?.gqCancelResponse(data: data)
-        self.view.window!.rootViewController?.dismiss(animated: false, completion: nil)
+        if let rootViewController = self.view.window?.rootViewController {
+            rootViewController.dismiss(animated: false, completion: nil)
+        }
+//        self.view.window!.rootViewController?.dismiss(animated: true, completion: nil)
+    }
+    
+    func sdError(data: [String : Any]?) {
+        print("sdCancel web callback received with data: \(String(describing: data))")
+        delegate?.gqFailureResponse(data: data)
+        if let rootViewController = self.view.window?.rootViewController {
+            rootViewController.dismiss(animated: false, completion: nil)
+        }
+//        self.view.window!.rootViewController?.dismiss(animated: true, completion: nil)
     }
     
     public var delegate: GQPaymentDelegate?
@@ -25,7 +37,9 @@ public class GQPaymentSDK: UIViewController, WebDelegate {
     let environment = Environment.shared
     
     public var clientJSONObject: [String: Any]?
-    private var mobileNumber: String?
+    private var mobileNumber: String = ""
+    var errorMessage: String = ""
+    var isInValid: Bool = false
     
     @IBOutlet weak var loaderView: UIActivityIndicatorView!
     
@@ -54,12 +68,18 @@ public class GQPaymentSDK: UIViewController, WebDelegate {
                             
                             environment.updateAbase(abase: abase!)
                         } else {
+                            isInValid = true
+                            errorMessage += "Auth is missing"
                             print("No Auth Object available")
                         }
                         
                         if let studentID = json["student_id"] as? String {
                             print("Student ID: \(studentID)")
                             environment.updateStudentID(stdId: studentID)
+                        }else {
+                            print("Student Id is missing")
+                            isInValid = true
+                            errorMessage += ", Student Id is required"
                         }
                         
                         if let env = json["env"] as? String {
@@ -67,9 +87,13 @@ public class GQPaymentSDK: UIViewController, WebDelegate {
                                 environment.update(environment: env)
                                 print("Environment: \(env)")
                             }else{
+                                isInValid = true
+                                errorMessage += ", Invalid environment"
                                 print("Invalid Environment: \(env)")
                             }
                         }else{
+                            isInValid = true
+                            errorMessage += ", Environment is required"
                             print("Environment Not Available ")
                         }
                         
@@ -96,9 +120,13 @@ public class GQPaymentSDK: UIViewController, WebDelegate {
                                     environment.updatePpConfig(ppConfig: ppConfigString)
                                 } else {
                                     print("Invalid ppConfig JSON")
+                                    isInValid = true
+                                    errorMessage += ", Invalid PP Config Object"
                                 }
                             } else {
                                 print("Slug Not available")
+                                isInValid = true
+                                errorMessage += ", Slug is required"
                             }
                         } else {
                             print("ppConfig Not avaibale")
@@ -111,53 +139,77 @@ public class GQPaymentSDK: UIViewController, WebDelegate {
                                 environment.updateFeeHeaders(feeHeader: feeHeadersString)
                             } else {
                                 print("Invalid Fee Headers JSON")
+                                isInValid = true
+                                errorMessage += ", Invalid Fee Headers Object"
                             }
                         } else {
                             print("Fee Headers Not avaibale")
                         }
                         
                         if let customerNumber = json["customer_number"] as? String {
-                            if validate(value: customerNumber){
-                                print("Customer Number: \(customerNumber)")
-                                environment.updateCustomerNumber(customerNumber: customerNumber)
-                                mobileNumber = customerNumber
-                                
-                                DispatchQueue.main.async {
-                                    self.customer()
-                                }
-                            }else{
-                                print("Invalid Customer Number: \(customerNumber)")
-                            }
+                            //                            if validate(value: customerNumber){
+                            print("Customer Number: \(customerNumber)")
+                            environment.updateCustomerNumber(customerNumber: customerNumber)
+                            mobileNumber = customerNumber
+                            
+                            //                                DispatchQueue.main.async {
+                            //                                    self.customer()
+                            //                                    makeAPICall()
+                            //                                }
+                            //                            }else{
+                            //                                print("Invalid Customer Number: \(customerNumber)")
+                            //                                isInValid = true
+                            //                                errorMessage += ", Invalid customer number"
+                            //                            }
                         }else{
-                            environment.updateCustomerType(custType: "new")
-                            print(getURL())
+                            
                             print("Customer Number Not Available ")
                         }
                     } else {
                         print("Failed to convert JSON data.")
+                        isInValid = true
+                        errorMessage += ", Invalid JSON Object"
                     }
                 } catch {
                     print("Error parsing JSON: \(error.localizedDescription)")
+                    isInValid = true
+                    errorMessage += ", Invalid JSON Object"
                 }
             } else {
                 print("Failed to convert JSON string to data.")
+                isInValid = true
+                errorMessage += ", Invalid JSON Object"
             }
         } else {
             print("Conversion to JSON failed.")
+            isInValid = true
+            errorMessage += ", Invalid JSON Object"
         }
         
-        let successData: [String: Any] = ["Status": "Success"]
-        let failedData: [String: Any] = ["Status": "Failed"]
-        let cancelData: [String: Any] = ["Status": "Cancel"]
+        if isInValid {
+            let errorObject: [String: Any] = [
+                "error": errorMessage
+            ]
+            DispatchQueue.main.async {
+//                self.sdError(data: errorObject)
+                self.delegate?.gqFailureResponse(data: errorObject)
+            }
         
-        // Simulate a successful scenario
-        delegate?.gqSuccessResponse(data: successData)
-        
-        // Simulate a failure scenario
-        self.delegate?.gqFailureResponse(data: failedData)
-        
-        // Simulate a cancellation scenario
-        self.delegate?.gqCancelResponse(data: cancelData)
+//            delegate?.gqFailureResponse(data: errorObject)
+//            self.dismiss(animated: true, completion: nil)
+//            self.view.window!.rootViewController?.dismiss(animated: false, completion: nil)
+        }else{
+            if mobileNumber.isEmpty{
+                environment.updateCustomerType(custType: "new")
+                getURL()
+            }else{
+                APIService.makeAPICall { responseObject, error in
+                    DispatchQueue.main.async {
+                        self.handleAPIResult(responseObject: responseObject, error: error)
+                    }
+                }
+            }
+        }
     }
     
     func validate(value: String) -> Bool {
@@ -172,12 +224,54 @@ public class GQPaymentSDK: UIViewController, WebDelegate {
         return validEnvironments.contains(value.lowercased())
     }
     
+    func handleAPIResult(responseObject: [String: Any]?, error: String?) {
+        if let error = error {
+            // Handle error
+            print("API Error: \(error)")
+            let errorObject: [String: Any] = [
+                "error": error
+            ]
+            self.delegate?.gqFailureResponse(data: errorObject)
+        } else if let responseObject = responseObject {
+            DispatchQueue.main.async {
+                let message = responseObject["message"] as! String
+                
+                if (message == "Customer Exists") {
+                    print("existing")
+                    self.environment.updateCustomerType(custType: "existing")
+                }
+                else {
+                    print("new")
+                    self.environment.updateCustomerType(custType: "new")
+                }
+                
+                let data = responseObject["data"] as! [String:AnyObject]
+                print("ResponseData: \(data)")
+                self.environment.updateCustomerCode(custCode: data["customer_code"] as! String)
+                self.environment.updateCustomerId(custId: data["customer_id"] as! Int)
+                
+                self.getURL()
+                
+                //                self.elegibity()
+            }
+//            if let message = responseObject["message"] as? String {
+//                // Handle success
+//                print("Success: \(message)")
+//                //                    resultLabel.text = "Success: \(message)"
+//            } else {
+//                // Unexpected response format
+//                print("Unexpected response format. Missing 'message' key.")
+//                //                    resultLabel.text = "Unexpected response format"
+//            }
+        }
+    }
+    
     public func customer() {
         guard mobileNumber != nil else {
             print("Mobile Number cannot be empty!")
             return
         }
-        Customer().makeCustomerRequest(mobile: "\(mobileNumber!)") { responseObject, error in
+        Customer().makeCustomerRequest(mobile: "\(mobileNumber)") { responseObject, error in
             guard let responseObject = responseObject, error == nil else {
                 print(error ?? "Unknown error")
                 self.delegate?.gqFailureResponse(data: ["error": true, "message": "You are unauthorized to access the SDK, please check your GQKey, and GQSecret"])

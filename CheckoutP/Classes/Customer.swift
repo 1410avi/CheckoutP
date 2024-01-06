@@ -38,10 +38,18 @@ public class Customer {
                 return
             }
             
+            guard let httpResponse = response as? HTTPURLResponse else {
+                    print("Unexpected response format")
+                    return
+                }
+            
             guard (200 ... 299) ~= response.statusCode else {                    // check for http errors
                 print("statusCode should be 2xx, but is \(response.statusCode)")
                 print("response = \(response)")
-                return completion(nil, nil)
+                print("response = \(error)")
+                print("response = \(httpResponse)")
+               
+                return completion(nil, error)
             }
             
             do {

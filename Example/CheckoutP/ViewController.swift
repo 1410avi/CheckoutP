@@ -16,10 +16,12 @@ class ViewController: UIViewController, GQPaymentDelegate {
     
     func gqFailureResponse(data: [String : Any]?) {
         print("Failed callback received with error: \(String(describing: data))")
+        self.dismiss(animated: true, completion: nil)
     }
     
     func gqCancelResponse(data: [String : Any]?) {
         print("Cancel callback received: \(String(describing: data))")
+        self.dismiss(animated: true, completion: nil)
     }
 
     override func viewDidLoad() {
@@ -65,7 +67,7 @@ class ViewController: UIViewController, GQPaymentDelegate {
             "student_id": "demo_1022",
             "env": "test",
             "customer_number": "8425900022",
-//            "pp_config": ppConfig,
+            "pp_config": ppConfig,
 //            "fee_headers": feeHeaders,
             "customization": customization
         ]

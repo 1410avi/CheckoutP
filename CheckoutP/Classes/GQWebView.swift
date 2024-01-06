@@ -27,6 +27,7 @@ class GQWebView: UIViewController, CFResponseDelegate, RazorpayPaymentCompletion
     var loadURL: String?
     
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        print("Received message from web -> \(message.body)")
         if (message.name == "sdkSuccess") {
             do {
                 let data = message.body as! String
@@ -42,7 +43,7 @@ class GQWebView: UIViewController, CFResponseDelegate, RazorpayPaymentCompletion
         }else if (message.name == "sdkCancel") {
             do {
                 let data = message.body as! String
-                let con = try JSONSerialization.jsonObject(with: data.data(using: .utf8)!, options: []) as! [String: Any]
+                let con = try JSONSerialization.jsonObject(with: data.data(using: .utf8)!, options: []) as? [String: Any]
                 print("sdkCancel: \(con)")
                 webDelegate?.sdCancel(data: con)
                 self.dismiss(animated: true, completion: nil)
@@ -179,7 +180,6 @@ class GQWebView: UIViewController, CFResponseDelegate, RazorpayPaymentCompletion
             //            newViewController.delegate = self
             //            self.present(newViewController, animated: true, completion: nil)
         }
-        print("Received message from web -> \(message.body)")
     }
     
     func convertStringToDictionary(text: String) -> [String:AnyObject]? {
