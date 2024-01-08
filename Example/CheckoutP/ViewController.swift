@@ -11,7 +11,7 @@ import CheckoutP
 
 class ViewController: UIViewController, GQPaymentDelegate {
     func gqSuccessResponse(data: [String : Any]?) {
-        print("Success callback received with data: \(String(describing: data))")
+        print("Success callback received with data: \(data)")
     }
     
     func gqFailureResponse(data: [String : Any]?) {
@@ -47,6 +47,7 @@ class ViewController: UIViewController, GQPaymentDelegate {
         
         let ppConfig: [String: Any] = [
             "slug": "masira-darvesh-ayc-two"
+//            "slug": "masira-darvesh-gile"
 //            "card_code": "card_code"
         ]
         
@@ -68,7 +69,7 @@ class ViewController: UIViewController, GQPaymentDelegate {
             "env": "test",
             "customer_number": "8425900022",
             "pp_config": ppConfig,
-//            "fee_headers": feeHeaders,
+            "fee_headers": feeHeaders,
             "customization": customization
         ]
         

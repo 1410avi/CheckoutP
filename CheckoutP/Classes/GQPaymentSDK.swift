@@ -11,7 +11,9 @@ public class GQPaymentSDK: UIViewController, WebDelegate {
     func sdSuccess(data: [String : Any]?) {
         print("sdSucess webview callback with data: \(String(describing: data))")
         delegate?.gqSuccessResponse(data: data)
-        self.dismiss(animated: true, completion: nil)
+//        if let rootViewController = self.view.window?.rootViewController {
+//            rootViewController.dismiss(animated: false, completion: nil)
+//        }
     }
     
     func sdCancel(data: [String : Any]?) {

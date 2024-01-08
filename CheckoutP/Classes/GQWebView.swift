@@ -34,6 +34,7 @@ class GQWebView: UIViewController, CFResponseDelegate, RazorpayPaymentCompletion
                 let con = try JSONSerialization.jsonObject(with: data.data(using: .utf8)!, options: []) as! [String: Any]
                 print("sdkSuccess: \(con)")
                 print("sdkSuccessdata: \(data)")
+                webDelegate?.sdSuccess(data: con)
                 //                delegate?.gqSuccessResponse(data: con)
             } catch {
                 print(error)
@@ -157,21 +158,6 @@ class GQWebView: UIViewController, CFResponseDelegate, RazorpayPaymentCompletion
                     print("Error parsing JSON: \(error)")
                 }
             }
-            
-            let ad_data = convertStringToDictionary(text: message.body as! String)
-            let razorpay_key = ad_data!["key"] as! String
-            rOrderId = ad_data!["order_id"] as? String
-            let callback_url = ad_data!["callback_url"]
-            recurring = ad_data!["recurring"] as? Bool
-            notes = ad_data!["notes"] as? [String: Any]
-            customer_id = ad_data!["customer_id"] as? String
-            let recurring_flag: Bool?
-            
-            //            if (recurring as! String == "1") { recurring_flag = true }
-            //            else { recurring_flag = false }
-            
-            razorpay = RazorpayCheckout.initWithKey(razorpay_key, andDelegate: self)
-            
             
             //            checkout_details = CheckoutDetails(order_id: order_id as? String ?? "", razorpay_key: (razorpay_key as! String), recurring: recurring_flag ?? true, notes: (notes as? [String : Any] ?? ["nil": "nil"]), customer_id: (customer_id as! String), callback_url: (callback_url as! String))
             //
@@ -394,23 +380,52 @@ class GQWebView: UIViewController, CFResponseDelegate, RazorpayPaymentCompletion
     }
     
     public func onPaymentError(_ code: Int32, description str: String, andData response: [AnyHashable : Any]?) {
-        let userInfo = response as NSDictionary? as? [String: String]
+        var userInfo = response as NSDictionary? as? [String: Any]
+        if ((callBackUrl?.isEmpty) != nil){
+            userInfo?["callback_url"] = callBackUrl
+        }
         print("ErrorCode: \(code)")
         print("ErrorDescription: \(str)")
         print("ErrorResponse: \(String(describing: userInfo))")
+        
+        if let jsonString = customInstance.convertDictionaryToJson(dictionary: userInfo!) {
+            print("JSON String: \(jsonString)")
+            if ((vName=="UNIPG") != nil) {
+                print("VName: \(String(describing: vName))")
+                webView.evaluateJavaScript("javascript:sendPGPaymentResponse(\(jsonString));")
+            }else {
+                print("VNameCash; \(String(describing: vName))")
+                webView.evaluateJavaScript("javascript:sendADPaymentResponse(\(jsonString));")
+            }
+            
+        } else {
+            print("Conversion to JSON failed.")
+        }
     }
     
     public func onPaymentSuccess(_ payment_id: String, andData response: [AnyHashable : Any]?) {
-        var userInfo = response as NSDictionary? as? [String: String]
+        var userInfo = response as NSDictionary? as? [String: Any]
+        if ((callBackUrl?.isEmpty) != nil){
+            userInfo?["callback_url"] = callBackUrl
+        }
         print("success: ", response)
         let paymentId = response?["razorpay_payment_id"] as! String
         let rezorSignature = response?["razorpay_signature"] as! String
         print("SuccessPaymentID: \(payment_id)")
         print("SuccessResponse: \(userInfo)")
-        if !vName!.isEmpty, vName == "UNIPG"{
-            print("VName: \(String(describing: vName))")
-        }else {
-            print("VNameCash; \(String(describing: vName))")
+        
+        if let jsonString = customInstance.convertDictionaryToJson(dictionary: userInfo!) {
+            print("JSON String: \(jsonString)")
+            if ((vName=="UNIPG") != nil) {
+                print("VName: \(String(describing: vName))")
+                webView.evaluateJavaScript("javascript:sendPGPaymentResponse(\(jsonString));")
+            }else {
+                print("VNameCash; \(String(describing: vName))")
+                webView.evaluateJavaScript("javascript:sendADPaymentResponse(\(jsonString));")
+            }
+            
+        } else {
+            print("Conversion to JSON failed.")
         }
     }
     
@@ -418,11 +433,28 @@ class GQWebView: UIViewController, CFResponseDelegate, RazorpayPaymentCompletion
         print("ErrorResponse: ")
         print(order_id)
         print(error.status)
-        print(error.description)
+        print(error.message)
+        let paymentResponse: [String: Any] = [
+            "status": error.status,
+            "order_code": order_id,
+            "message": error.message,
+            "code": error.code,
+            "type": error.type
+        ]
+        print("SuccessResponse: ")
+        print(order_id)
+        if let jsonString = customInstance.convertDictionaryToJson(dictionary: paymentResponse) {
+            print("JSON String: \(jsonString)")
+            webView.evaluateJavaScript("javascript:sendPGPaymentResponse(\(jsonString));")
+//            webDelegate?.sdSuccess(data: paymentResponse)
+//            self.dismiss(animated: true, completion: nil)
+        } else {
+            print("Conversion to JSON failed.")
+        }
     }
     
     public func verifyPayment(order_id: String) {
-        let paymentResponse = [
+        let paymentResponse: [String: Any] = [
             "status": "SUCCESS",
             "order_code": order_id
         ]
@@ -431,8 +463,8 @@ class GQWebView: UIViewController, CFResponseDelegate, RazorpayPaymentCompletion
         if let jsonString = customInstance.convertDictionaryToJson(dictionary: paymentResponse) {
             print("JSON String: \(jsonString)")
             webView.evaluateJavaScript("javascript:sendPGPaymentResponse(\(jsonString));")
-            webDelegate?.sdSuccess(data: paymentResponse)
-            self.dismiss(animated: true, completion: nil)
+//            webDelegate?.sdSuccess(data: paymentResponse)
+//            self.dismiss(animated: true, completion: nil)
         } else {
             print("Conversion to JSON failed.")
         }
